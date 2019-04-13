@@ -5,7 +5,7 @@ WebEngage Unity Android plugin for Unity Android apps. This unitypackage is only
 
 ## Installation
 
- 1. Download the WebEngageUnityAndroid.unitypackage from root of this repository.
+ 1. Download the [WebEngageUnityAndroid.unitypackage](https://github.com/WebEngage/webengage-unity-android/raw/master/WebEngageUnityAndroid.unitypackage).
 
  2. Import the downloaded unitypackage into your Unity project through `Assets` > `Import Package` > `Custom Package...`.
 
@@ -32,7 +32,7 @@ WebEngage Unity Android plugin for Unity Android apps. This unitypackage is only
 </manifest>
 ```
 
-If Add `AndroidManifest.xml` file does not exist in `Assets/Plugins/Android/` directory of your Unity project, then you can create a new `AndroidManifest.xml` file and copy the below content in it.
+If `AndroidManifest.xml` file does not exist in `Assets/Plugins/Android/` directory of your Unity project, then you can create a new `AndroidManifest.xml` file and copy the below content in it.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -78,14 +78,14 @@ If Add `AndroidManifest.xml` file does not exist in `Assets/Plugins/Android/` di
 2. Initialize the WebEngage SDK at start of your application.
 
 ```csharp
-using WebEngage;
+using WebEngageBridge;
 ...
 
 public class YourScript : MonoBehaviour
 {
     private void Awake()
     {
-        WebEngageBridge.Engage();
+        WebEngage.Engage();
         ...
     }
     ...
@@ -95,7 +95,7 @@ public class YourScript : MonoBehaviour
 
 ## Attribution Tracking
 
-Add the following receiver tag in the `Assets/Plugins/Android/AndroidManifest.xml` file.
+Add the following receiver tag in the `Assets/Plugins/Android/AndroidManifest.xml` file for tracking app installs and user-acquisition attribute details.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -158,14 +158,31 @@ public class YourScript : MonoBehaviour
     // Set user email
     WebEngage.SetEmail("john.doe@email.com");
 
-    // Set user gender
-    WebEngage.SetGender(Gender.Male);
+    // Set user hashed email
+    WebEngage.SetHashedEmail("144e0424883546e07dcd727057fd3b62");
 
-    // Set user birth-date
+    // Set user phone number
+    WebEngage.SetPhoneNumber("+551155256325");
+
+    // Set user hashed phone number
+    WebEngage.SetHashedPhoneNumber("e0ec043b3f9e198ec09041687e4d4e8d");
+
+    // Set user gender, allowed values are ['male', 'female', 'other']
+    WebEngage.SetGender("male");
+
+    // Set user birth-date, supported format: 'yyyy-mm-dd'
     WebEngage.SetBirthDate("1994-04-29");
 
     // Set user company
     WebEngage.SetCompany("Google");
+
+    // Set opt-in status, channels: ['push', 'in_app', 'email', 'sms']
+    WebEngage.SetOptIn("push", true);
+
+    // Set user location
+    double latitude = 19.0822;
+    double longitude = 72.8417;
+    WebEngage.SetLocation(latitude, longitude);
 }
 ```
 
@@ -174,10 +191,11 @@ public class YourScript : MonoBehaviour
 ```csharp
 using WebEngageBridge;
     ...
-
+    // Set custom user attributes
     WebEngage.SetUserAttribute("age", 25);
     WebEngage.SetUserAttribute("premium", true);
 
+    // Set multiple custom user attributes
     Dictionary<string, object> customAttributes = new Dictionary<string, object>();
     customAttributes.Add("Twitter Email", "john.twitter@mail.com");
     customAttributes.Add("Subscribed", true);
@@ -267,26 +285,41 @@ using WebEngageBridge;
 
 1. Import FCM Unity plugin as instructed [here](https://firebase.google.com/docs/cloud-messaging/unity/client) into your Unity project.
 
-2. If you have replaced the `Assets/Plugins/Android/AndroidManifest.xml` then make sure to add back your WebEngage license-code and debug-mode in the `AndroidManifest.xml` file.
+2. If you have replaced the `Assets/Plugins/Android/AndroidManifest.xml` then make sure to add back your WebEngage license-code and debug-mode meta-data tags in the `AndroidManifest.xml` file.
 
 3. In your script where you have registered callbacks for `OnTokenReceived` and `OnMessageReceived`, add the following code snippets.
 
 ```csharp
-public void OnTokenReceived(object sender, Firebase.Messaging.TokenReceivedEventArgs token)
-{
+using WebEngageBridge;
     ...
-    WebEngageBridge.SetPushToken(token.Token);
-}
-
-public void OnMessageReceived(object sender, Firebase.Messaging.MessageReceivedEventArgs e)
-{
-    Dictionary<string, string> data = new Dictionary<string, string>(e.Message.Data);
-    if (data.ContainsKey("source") && "webengage".Equals(data["source"]))
+    Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => {
+        var dependencyStatus = task.Result;
+        if (dependencyStatus == Firebase.DependencyStatus.Available)
+        {
+            Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
+            Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
+        }
+        else
+        {
+            ...
+        }
+    });
+    
+    public void OnTokenReceived(object sender, Firebase.Messaging.TokenReceivedEventArgs token)
     {
-        WebEngageBridge.SendPushData(data);
+        ...
+        WebEngage.SetPushToken(token.Token);
     }
-    ...
-}
+
+    public void OnMessageReceived(object sender, Firebase.Messaging.MessageReceivedEventArgs e)
+    {
+        Dictionary<string, string> data = new Dictionary<string, string>(e.Message.Data);
+        if (data.ContainsKey("source") && "webengage".Equals(data["source"]))
+        {
+            WebEngage.SendPushData(data);
+        }
+        ...
+    }
 ```
 
 Push notifications will work as expected when app is in foreground.
@@ -297,9 +330,9 @@ Push notifications will work as expected when app is in foreground.
 
 1. Import FCM Unity plugin as instructed [here](https://firebase.google.com/docs/cloud-messaging/unity/client) into your Unity project.
 
-2. If you have replaced the `Assets/Plugins/Android/AndroidManifest.xml` then make sure to add back your WebEngage license-code and debug-mode in the `AndroidManifest.xml` file.
+2. If you have replaced the `Assets/Plugins/Android/AndroidManifest.xml` then make sure to add back your WebEngage license-code and debug-mode meta-data tags in the `AndroidManifest.xml` file.
 
-3. Download and add the `webengage-android-fcm.aar` file from root of this repository in `Assets/Plugins/Android/` directory of your Unity project.
+3. Download and add the [webengage-android-fcm.aar](https://github.com/WebEngage/webengage-unity-android/raw/master/webengage-android-fcm-0.0.1.aar) file in `Assets/Plugins/Android/` directory of your Unity project.
 
 4. Add the following service tag in your `Assets/Plugins/Android/AndroidManifest.xml` file as shown below.
 
