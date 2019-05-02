@@ -234,7 +234,7 @@ using WebEngageBridge;
     orderPlacedAttributes.Add("Product 2 Name", "Hugo Boss Jacket");
     orderPlacedAttributes.Add("Product 2 Price", 507.99);
     orderPlacedAttributes.Add("Product 2 Size", "L");
-    orderPlacedAttributes.Add("Delivery Date", System.DateTime.ParseExact("2017-10-21 09:27:37.100", "yyyy-MM-dd hh:mm:ss.fff", null));
+    orderPlacedAttributes.Add("Delivery Date", System.DateTime.ParseExact("2017-10-21 09:27:37.100", "yyyy-MM-dd HH:mm:ss.fff", null));
     orderPlacedAttributes.Add("Delivery City", "San Francisco");
     orderPlacedAttributes.Add("Delivery ZIP", "94121");
     orderPlacedAttributes.Add("Coupon Applied", "BOGO17");
@@ -368,3 +368,25 @@ using WebEngageBridge;
 ## In-app Notifications
 
 No additional steps are required for in-app notifications.
+
+### Tracking Screens
+
+```csharp
+using WebEngageBridge;
+    ...
+    
+    // Set screen name
+    WebEngage.ScreenNavigated("Purchase Screen");
+
+    // Update current screen data
+    Dictionary<string, object> currentData = new Dictionary<string, object>();
+    currentData.Add("productId", "~hs7674");
+    currentData.Add("price", 1200);
+    WebEngage.SetScreenData(currentData);
+
+    // Set screen name with data
+    Dictionary<string, object> data = new Dictionary<string, object>();
+    data.Add("productId", "~hs7674");
+    data.Add("price", 1200);
+    WebEngage.ScreenNavigated("Purchase Screen", data);
+```

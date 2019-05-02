@@ -126,7 +126,7 @@ namespace WebEngageBridge
             }
             else if (val is System.DateTime)
             {
-                string strDate = ((System.DateTime) val).ToString("yyyy-MM-dd hh:mm:ss.fff");
+                string strDate = ((System.DateTime) val).ToString("yyyy-MM-dd HH:mm:ss.fff");
                 try
                 {
                     var format = new AndroidJavaObject("java.text.SimpleDateFormat", "yyyy-MM-dd HH:mm:ss.SSS");
