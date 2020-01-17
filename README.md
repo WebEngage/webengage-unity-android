@@ -10,6 +10,11 @@ WebEngage Unity Android plugin for Unity Android apps. This unitypackage is only
  2. Import the downloaded unitypackage into your Unity project through `Assets` > `Import Package` > `Custom Package...`.
 
 
+## Update
+
+ 1. Replace the AAR file at `Assets/Plugins/Android/webengage-android-unity-X.X.X.aar` with the latest [webengage-android-unity.aar](https://github.com/WebEngage/webengage-unity-android/raw/master/Assets/Plugins/Android/webengage-android-unity-3.15.0.aar).
+
+
 ## Initialization
 
 1. Add the following meta-data tags in `Assets/Plugins/Android/AndroidManifest.xml` file of your Unity project.
@@ -20,7 +25,8 @@ WebEngage Unity Android plugin for Unity Android apps. This unitypackage is only
     ...>
 
     <application
-    	...>
+    	...
+        android:allowBackup="false">
 
 	    <meta-data android:name="com.webengage.sdk.android.key" android:value="YOUR-WEBENGAGE-LICENSE-CODE" />
 
@@ -42,7 +48,8 @@ If `AndroidManifest.xml` file does not exist in `Assets/Plugins/Android/` direct
 
     <application
         android:label="@string/app_name"
-        android:icon="@drawable/app_icon">
+        android:icon="@drawable/app_icon"
+        android:allowBackup="false">
 
         <meta-data android:name="com.webengage.sdk.android.key" android:value="YOUR-WEBENGAGE-LICENSE-CODE" />
 
