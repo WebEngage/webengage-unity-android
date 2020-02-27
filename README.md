@@ -113,34 +113,6 @@ In order to track 'App Installed' events and install-referrer URLs, follow the s
 3. Add the aar file to your Unity project at the location `/Assets/Plugins/Android/installreferrer-X.X.X.aar`.
 
 
-~~## Attribution Tracking (Deprecated)~~
-
-Add the following receiver tag in the `Assets/Plugins/Android/AndroidManifest.xml` file for tracking app installs and user-acquisition attribute details.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<manifest
-    ...>
-
-    <application
-        ...>
-
-        ...
-
-        <receiver
-          android:name="com.webengage.sdk.android.InstallTracker"
-          android:exported="true">
-          <intent-filter>
-             <action android:name="com.android.vending.INSTALL_REFERRER" />
-          </intent-filter>
-        </receiver>
-
-        ...
-    </application>
-</manifest>
-```
-
-
 ## Tracking Users
 
 1. Login and Logout
