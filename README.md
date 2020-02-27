@@ -9,10 +9,12 @@ WebEngage Unity Android plugin for Unity Android apps. This unitypackage is only
 
  2. Import the downloaded unitypackage into your Unity project through `Assets` > `Import Package` > `Custom Package...`.
 
+ 3. Replace the AAR file at `Assets/Plugins/Android/webengage-android-unity-X.X.X.aar` with the latest [webengage-android-unity.aar](https://github.com/WebEngage/webengage-unity-android/raw/master/Assets/Plugins/Android/webengage-android-unity-3.16.0.aar).
+
 
 ## Update
 
- 1. Replace the AAR file at `Assets/Plugins/Android/webengage-android-unity-X.X.X.aar` with the latest [webengage-android-unity.aar](https://github.com/WebEngage/webengage-unity-android/raw/master/Assets/Plugins/Android/webengage-android-unity-3.15.0.aar).
+ 1. Replace the AAR file at `Assets/Plugins/Android/webengage-android-unity-X.X.X.aar` with the latest [webengage-android-unity.aar](https://github.com/WebEngage/webengage-unity-android/raw/master/Assets/Plugins/Android/webengage-android-unity-3.16.0.aar).
 
 
 ## Initialization
@@ -101,6 +103,17 @@ public class YourScript : MonoBehaviour
 
 
 ## Attribution Tracking
+
+In order to track 'App Installed' events and install-referrer URLs, follow the steps below.
+
+1. Make sure that you are using webengage-android-unity.aar version 3.16.0 or above.
+
+2. Download the latest version of [Android Install Referrer library (aar)](https://mvnrepository.com/artifact/com.android.installreferrer/installreferrer).
+
+3. Add the aar file to your Unity project at the location `/Assets/Plugins/Android/installreferrer-X.X.X.aar`.
+
+
+~~## Attribution Tracking (Deprecated)~~
 
 Add the following receiver tag in the `Assets/Plugins/Android/AndroidManifest.xml` file for tracking app installs and user-acquisition attribute details.
 
