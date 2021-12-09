@@ -4,6 +4,139 @@ using UnityEngine;
 
 namespace WebEngageBridge
 {
+    public delegate void callback(string pushData);
+#if (UNITY_ANDROID)
+    public sealed class WEPushNotificationCallback: AndroidJavaProxy {
+        private callback recCallbackObj = null;
+        private callback clickCallbackObj = null;
+        public static WEPushNotificationCallback instance = null;
+        private static readonly object padlock = new object();
+
+        public static WEPushNotificationCallback Instance
+          {
+             get
+            {
+             lock (padlock)
+                {
+                 if (instance == null)
+                 {
+                    instance = new WEPushNotificationCallback();
+                 }
+                 return instance;
+                }
+            }
+         }
+
+        public void setPushReceivedCallBackObj(callback obj) {
+            recCallbackObj = obj;
+        }
+
+        public void setPushClickCallBackObj(callback obj) {
+            clickCallbackObj = obj;
+        }
+
+
+        private WEPushNotificationCallback() : base("com.webengage.sdk.android.unity.WEUnityPushCallbacks") {
+            Debug.Log("WEPushNotificationCallback");
+            new AndroidJavaObject("com.webengage.sdk.android.unity.WEUnityCallbacksPushImpl", this);
+        }
+
+        public string onPushNotificationReceived(string jsonString) {
+            Debug.Log("WEPushNotificationCallback onPushNotificationReceived: " + jsonString);
+            if (recCallbackObj != null) {
+                recCallbackObj(jsonString);
+            }
+            return jsonString;
+        }
+
+        public bool onPushNotificationClicked(string jsonString) {
+            Debug.Log("WEPushNotificationCallback onPushNotificationClicked: " + jsonString);
+            if (clickCallbackObj != null) {
+                clickCallbackObj(jsonString);
+                return true;
+            }
+            return false;
+        }
+    }
+#endif
+
+#if (UNITY_ANDROID)
+    public class WEInAppNotificationCallback: AndroidJavaProxy {
+        private callback callbackObjPrepared = null;
+        private callback callbackObjShown = null;
+        private callback callbackObjClicked = null;
+        private callback callbackObjDismissed = null;
+        public static WEInAppNotificationCallback instance = null;
+        private static readonly object padlock2 = new object();
+
+        public static WEInAppNotificationCallback Instance
+          {
+             get
+            {
+             lock (padlock2)
+                {
+                 if (instance == null)
+                 {
+                    instance = new WEInAppNotificationCallback();
+                 }
+                 return instance;
+                }
+            }
+         }
+
+
+        public void setInAppPrepared(callback obj) {
+            callbackObjPrepared = obj;
+        }
+
+        public void setInAppDismissed(callback obj) {
+            callbackObjDismissed = obj;
+        }
+        public void setInAppShown(callback obj) {
+            callbackObjShown = obj;
+        }
+        public void setInAppClicked(callback obj) {
+            callbackObjClicked = obj;
+        }
+
+        private WEInAppNotificationCallback() : base("com.webengage.sdk.android.unity.WEUnityInAppCallbacks") {
+            new AndroidJavaObject("com.webengage.sdk.android.unity.WEUnityCallbacksInAppImpl", this);
+        }
+
+        public string onInAppNotificationPrepared(string jsonString) {
+            Debug.Log("WEInAppNotificationCallback onInAppNotificationPrepared: " + jsonString);
+            if (callbackObjPrepared != null) {
+                callbackObjPrepared(jsonString);
+            }
+            return jsonString;
+        }
+
+        public void onInAppNotificationShown(string jsonString) {
+            Debug.Log("WEInAppNotificationCallback onInAppNotificationShown: " + jsonString);
+            if (callbackObjShown != null) {
+                callbackObjShown(jsonString);
+            }
+        }
+
+         public bool onInAppNotificationClicked(string jsonString) {
+            Debug.Log("WEInAppNotificationCallback onInAppNotificationClicked: " + jsonString);
+            if (callbackObjClicked != null) {
+                callbackObjClicked(jsonString);
+                return true;
+            }
+            return false;
+        }
+
+         public void onInAppNotificationDismissed(string jsonString) {
+            Debug.Log("WEInAppNotificationCallback onInAppNotificationDismissed: " + jsonString);
+            if (callbackObjDismissed != null) {
+                callbackObjDismissed(jsonString);
+            }
+        }
+    }
+    
+#endif
+
     public class WebEngage
     {
 #if (UNITY_ANDROID && !UNITY_EDITOR)
@@ -19,7 +152,7 @@ namespace WebEngageBridge
             return webEngageClass;
         }
 
-        private static AndroidJavaObject GetWebEngage()
+        public static AndroidJavaObject GetWebEngage()
         {
             return GetWebEngageClass().CallStatic<AndroidJavaObject>("get");
         }
@@ -34,6 +167,76 @@ namespace WebEngageBridge
             return GetWebEngage().Call<AndroidJavaObject>("user");
         }
 #endif
+
+         public static void setPushClickCallBack(callback obj)
+        {
+            Debug.Log("setPushClickCallBack");
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                //pushClickCallBack(obj);
+            } else if (Application.platform == RuntimePlatform.Android){
+                var call = WEPushNotificationCallback.Instance;
+                call.setPushClickCallBackObj(obj);
+            }
+        }
+
+        public static void setPushReceivedCallBack(callback obj)
+        {
+            Debug.Log("setPushReceivedCallBack");
+            if (Application.platform == RuntimePlatform.Android){
+                 var call = WEPushNotificationCallback.Instance;
+                call.setPushReceivedCallBackObj(obj);
+            }
+        }
+
+        public static void setInAppPreparedCallBack(callback obj)
+        {
+                        Debug.Log("setInAppPreparedCallBack");
+
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+               // InAppPreparedCallBack(obj);
+            } else if (Application.platform == RuntimePlatform.Android){
+                var inApp = WEInAppNotificationCallback.Instance;
+                inApp.setInAppPrepared(obj);
+            }
+        }
+        public static void setInAppShownCallBack(callback obj)
+        {
+                        Debug.Log("setInAppShownCallBack");
+
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+               // InAppShownCallBack(obj);
+            } else if (Application.platform == RuntimePlatform.Android){
+                 var inApp = WEInAppNotificationCallback.Instance;
+                inApp.setInAppShown(obj);
+            }
+        }
+        public static void setInAppCLickedCallBack(callback obj)
+        {
+                        Debug.Log("setInAppCLickedCallBack");
+
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                //InAppCLickedCallBack(obj);
+            } else if (Application.platform == RuntimePlatform.Android){
+                var inApp = WEInAppNotificationCallback.Instance;
+                inApp.setInAppClicked(obj);
+            }
+        }
+        public static void setInAppDismissedCallBack(callback obj)
+        {
+                        Debug.Log("setInAppDismissedCallBack");
+
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+               // InAppDismissedCallBack(obj);
+            } else if (Application.platform == RuntimePlatform.Android){
+                var inApp = WEInAppNotificationCallback.Instance;
+                inApp.setInAppDismissed(obj);
+            }
+        }
 
         public static void Engage()
         {
