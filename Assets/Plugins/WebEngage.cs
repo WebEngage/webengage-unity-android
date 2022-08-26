@@ -213,10 +213,10 @@ namespace WebEngageBridge
                 inApp.setInAppShown(obj);
             }
         }
-        public static void setInAppCLickedCallBack(callback obj)
-        {
-                        Debug.Log("setInAppCLickedCallBack");
 
+        public static void setInAppClickedCallBack(callback obj)
+        {
+            Debug.Log("setInAppClickedCallBack");
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 //InAppCLickedCallBack(obj);
@@ -647,6 +647,13 @@ namespace WebEngageBridge
 #if (UNITY_ANDROID && !UNITY_EDITOR)
             AndroidJavaObject hashMap = GetHashMap(map);
             GetUser().Call("setAttributes", hashMap);
+#endif
+        }
+
+     public static void SetDevicePushOptIn(bool val)
+        {
+#if (UNITY_ANDROID && !UNITY_EDITOR)
+            GetUser().Call("setDevicePushOptIn", val);
 #endif
         }
 
